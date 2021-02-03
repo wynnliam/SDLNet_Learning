@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 
@@ -59,6 +60,19 @@ int remove_client(int pos) {
   }
 
   return 0;
+}
+
+void send_message(int from_index, char* message) {
+  char to_send[2048];
+
+  sprintf(to_send, "clients[%d]: %s", clients[from_index].id, message);
+
+  int i;
+  for(i = 0; i < MAX_CLIENTS; i++) {
+    if(clients[i].active && i != from_index) {
+      SDLNet_TCP_Send(clients[i].socket, to_send, strlen(to_send));
+    }
+  }
 }
 
 int main() {
@@ -138,8 +152,10 @@ int main() {
 
           if(result < 1)
             remove_client(i);
-          else
+          else {
             printf("client[%d]: %s\n", clients[i].id, message);
+            send_message(i, (char*)message);
+          }
         }
       }
     }

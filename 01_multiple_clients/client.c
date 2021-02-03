@@ -21,6 +21,8 @@ int main() {
 
   IPaddress ip;
   TCPsocket tcpsocket;
+  // Use a set of one to listen for activity from server.
+  SDLNet_SocketSet set;
   unsigned short port = 1234;
 
   if(SDLNet_ResolveHost(&ip, "localhost", port) == -1) {
@@ -34,9 +36,24 @@ int main() {
     return -1;
   }
 
-  printf("Connected!\nPlease enter a message\n> ");
+  set = SDLNet_AllocSocketSet(1);
+  SDLNet_TCP_AddSocket(set, tcpsocket);
+
+  printf("Connected!\nPlease enter a message\n");
+
+  int num_ready;
 
   while(1) {
+    num_ready = SDLNet_CheckSockets(set, 100);
+
+    if(num_ready && SDLNet_SocketReady(tcpsocket)) {
+      char recmessage[2048];
+      int result = SDLNet_TCP_Recv(tcpsocket, recmessage, 2048);
+
+      if(result >= 1)
+        printf("%s\n", recmessage);
+    }
+
     char message[1024];
     int len;
     scanf("%s", message);
