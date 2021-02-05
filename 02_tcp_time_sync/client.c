@@ -5,6 +5,8 @@ int main() {
   IPaddress ip;
   TCPsocket server;
 
+  packet p;
+
   printf("client: starting\n");
 
   SDL_Init(0);
@@ -16,7 +18,15 @@ int main() {
   printf("connected!\n");
 
   while(1) {
-    SDL_Delay(1000);
+    recv_packet(server, &p);
+    print_packet(&p);
+
+    SDL_Delay(1500);
+
+    p.type=1;
+    p.data.s.s=-4567;
+    send_packet(server, &p);
+    break;
   }
 
   printf("client: ending\n");

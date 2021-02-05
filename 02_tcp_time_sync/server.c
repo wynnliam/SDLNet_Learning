@@ -5,6 +5,12 @@ int main() {
   IPaddress ip;
   TCPsocket server, client;
 
+  packet p;
+  int done;
+  int minoff = 5; //+ or -
+  unsigned int last, now;
+  float lag;
+
   printf("server: starting\n");
 
   SDL_Init(0);
@@ -22,9 +28,31 @@ int main() {
     }
 
     printf("We got the client!\n");
-    while(1) {
-      SDL_Delay(1000);
+
+    
+    done = 0;
+    lag = 0;
+
+    p.type = 0;
+    p.data.u.s = SDL_GetTicks();
+    send_packet(client, &p);
+
+    now = SDL_GetTicks();
+
+    while(!done) {
+      last = now;
+
+      recv_packet(client, &p);
+
+      now = SDL_GetTicks();
+      lag = (now - last) / 2.0;
+
+      print_packet(&p);
+
+      done = 1;
     }
+
+    break;
   }
 
   printf("server: ending\n");
