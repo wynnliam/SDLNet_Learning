@@ -49,12 +49,47 @@ int main() {
 
       print_packet(&p);
 
-      done = 1;
-    }
+      switch(p.type) {
+        case 0:
+          p.type = 1;
+          p.data.u.s = SDL_GetTicks() + (unsigned int)lag;
+          send_packet(client, &p);
+          break;
 
-    break;
+        case 1:
+          p.type = 2;
+        case 2:
+          p.data.s.c = now - (unsigned int)lag - p.data.u.c;
+          if(p.data.s.c < minoff && p.data.s.c >-minoff) {
+            p.type = 3;
+            p.data.u.s = SDL_GetTicks() + (unsigned int)lag + minoff * 100;
+          } else {
+            p.data.u.s = SDL_GetTicks() + (unsigned int)lag;
+          }
+
+          send_packet(client, &p);
+
+          if(p.type == 3) {
+            printf("server: wait until %u\n", p.data.u.s);
+            SDL_Delay(p.data.u.s - SDL_GetTicks());
+            printf("server: TIME = %u\n", SDL_GetTicks());
+            done = 1;
+          }
+
+          break;
+        default:
+          done = 1;
+          break;
+      }
+
+      printf("now=%u (lag=%.2f)\n", now, lag);
+      p.type = 10;
+    }
   }
 
   printf("server: ending\n");
+
+  SDLNet_Quit();
+  SDL_Quit();
   return 0;
 }
