@@ -26,5 +26,5 @@ void print_packet(packet* p) {
   printf("\tdata.u.s=%u\n", p->data.u.s);
   printf("\tdata.u.c=%u\n", p->data.u.c);
   printf("\tdata.d.s=%d\n", p->data.s.s);
-  printf("\tdata.d.s=%d\n", p->data.s.c);
+  printf("\tdata.d.c=%d\n", p->data.s.c);
 }
