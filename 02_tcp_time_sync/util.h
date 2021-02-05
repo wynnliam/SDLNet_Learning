@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 
+#define PORT	1234
+
 typedef struct {
   unsigned char type;
   union {
